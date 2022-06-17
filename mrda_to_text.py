@@ -41,10 +41,7 @@ val_split = load_text_data(os.path.join(metadata_dir, 'val_split.txt'))
 # Load basic da map data
 da_map_data = load_text_data(os.path.join(metadata_dir, 'basic_da_map.txt'))
 # Split on tabs and save to dictionary (key=full_da : val=basic_da)
-da_map = dict()
-for line in da_map_data:
-    da_map[line.split('\t')[0]] = line.split('\t')[1]
-
+da_map = {line.split('\t')[0]: line.split('\t')[1] for line in da_map_data}
 # Process each transcript
 for transcript in transcript_list:
 
@@ -52,8 +49,16 @@ for transcript in transcript_list:
     transcript_name = str(transcript.split('.')[0])
 
     # Get the transcript and database file
-    transcript = load_text_data(os.path.join(archive_dir, 'transcripts', transcript_name + '.trans'), verbose=False)
-    database = load_text_data(os.path.join(archive_dir, 'database', transcript_name + '.dadb'), verbose=False)
+    transcript = load_text_data(
+        os.path.join(archive_dir, 'transcripts', f'{transcript_name}.trans'),
+        verbose=False,
+    )
+
+    database = load_text_data(
+        os.path.join(archive_dir, 'database', f'{transcript_name}.dadb'),
+        verbose=False,
+    )
+
 
     # Process the utterances and create a dialogue object
     dialogue = process_transcript(transcript, database, da_map, excluded_chars, excluded_tags)
@@ -76,7 +81,7 @@ for transcript in transcript_list:
 
     # If only saving utterances use different directory
     if utterance_only_flag:
-        set_dir = os.path.join(data_dir, set_dir + '_utt')
+        set_dir = os.path.join(data_dir, f'{set_dir}_utt')
     else:
         set_dir = os.path.join(data_dir, set_dir)
 
