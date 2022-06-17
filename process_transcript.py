@@ -11,8 +11,14 @@ class Dialogue:
         self.utterances = utterances
 
     def __str__(self):
-        return str("Conversation: " + self.conversation_id + "\n"
-                   + "Number of Utterances: " + str(self.num_utterances))
+        return str(
+            (
+                f"Conversation: {self.conversation_id}"
+                + "\n"
+                + "Number of Utterances: "
+            )
+            + str(self.num_utterances)
+        )
 
 
 class Utterance:
@@ -24,11 +30,24 @@ class Utterance:
         self.full_da_label = full_da_label
 
     def __str__(self):
-        return str(self.speaker + " " +
-                   self.text + " " +
-                   self.basic_da_label + " " +
-                   self.general_da_label + " " +
-                   self.full_da_label)
+        return str(
+            (
+                (
+                    (
+                        (
+                            (
+                                ((f"{self.speaker} " + self.text) + " ")
+                                + self.basic_da_label
+                            )
+                            + " "
+                        )
+                        + self.general_da_label
+                    )
+                    + " "
+                )
+                + self.full_da_label
+            )
+        )
 
 
 def process_transcript(transcript, database, da_map, excluded_chars=None, excluded_tags=None):
@@ -61,10 +80,11 @@ def process_transcript(transcript, database, da_map, excluded_chars=None, exclud
                     utterance_text.append(word)
 
         # Check utterance is not only punctuation (because the rest was invalid/removed)
-        if len(utterance_text) > 0 and all(char in ['.', '?', '!', ' '] for char in utterance_text[0]):
+        if utterance_text and all(
+            char in ['.', '?', '!', ' '] for char in utterance_text[0]
+        ):
             # If so, ignore
             continue
-        # Else if the last token is punctuation, concatenate with last word
         elif len(utterance_text) > 1 and any(char in ['.', '?', '!'] for char in utterance_text[-1]):
             if len(utterance_text[-2]) > 0:
                 utterance_text[-2] = ''.join((utterance_text[-2], utterance_text[-1]))
@@ -104,9 +124,7 @@ def process_transcript(transcript, database, da_map, excluded_chars=None, exclud
 
     # Create Dialogue
     transcript_id = transcript[0].split('-')[0]
-    dialogue = Dialogue(transcript_id, len(utterances), utterances)
-
-    return dialogue
+    return Dialogue(transcript_id, len(utterances), utterances)
 
 
 def concatenate_acronyms(utterance_text):
